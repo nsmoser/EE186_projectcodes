@@ -37,7 +37,7 @@ void loop(){
   tempCheck(tempF);                                         //temp check function defined below
 
   capCheck(capReading);                                     //cap check function defined below
-  Serial.println(tempF);
+
   delay(1000);                                              //waits a second to restart loop
 }
 
