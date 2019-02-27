@@ -1,3 +1,11 @@
+/*
+Arduino code used in plant sensor. Uses a few user defined functions to simplify code. In short, it collects 
+thresholds from user through serial input, then produces output by comparing user thresholds to readings from 
+capacative soil sensor and thermometer. Output is data sent to another arduino using digitalWrite high and low 
+signals. Also controls a relay connected to CAP_LOW_PIN. Can be connected to LEDs instead of other arduino.
+Relies on Adafruit seesaw library, not included with arduino IDE.
+*/
+
 #include"Adafruit_seesaw.h"
 
 Adafruit_seesaw ss;                                         //needed for soil sensor.
@@ -72,7 +80,7 @@ void tempCheck(float tempF){                                //function used to c
   }
 }
 
-void capCheck(uint16_t capReading){                           //function used to check cap reading in main.
+void capCheck(uint16_t capReading){                        //function used to check cap reading in main.
   if(capReading>capThreshold[MAX]){                        //if branch executes if cap is over max.
     digitalWrite(CAP_HIGH_PIN,HIGH);                       //sets cap high pin to high.
     digitalWrite(CAP_LOW_PIN,LOW);                         //used to detect overwatering.
