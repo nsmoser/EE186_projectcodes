@@ -5,13 +5,13 @@ capacative soil sensor and thermometer. Output is data sent to another arduino u
 signals. Also controls a relay connected to CAP_LOW_PIN. Can be connected to LEDs instead of other arduino.
 Relies on Adafruit seesaw library, not included with arduino IDE.
 */
-
 #include"Adafruit_seesaw.h"
 
 Adafruit_seesaw ss;                                         //needed for soil sensor.
 const int MIN=0,MAX=1;                                      //used when indexing threshold arrays.
 const int TEMP_LOW_PIN=5,TEMP_HIGH_PIN=6;                   //assigns pins to be used later.
 const int CAP_LOW_PIN=7,CAP_HIGH_PIN=8;                     //no reason why specific numbers were picked.
+const int RELAY_CONTROL=9;                                  //pin used to control relay.
 float tempThreshold[2],capThreshold[2];                     //creates threshold arrays.
 String minMax[2]={"Minimum","Maximum"};                     //array of strings used for min max prompt.
                                                             
@@ -22,6 +22,7 @@ void setup(){
   pinMode(TEMP_HIGH_PIN,OUTPUT);                            //will be used to send signals to mega.
   pinMode(CAP_LOW_PIN,OUTPUT);
   pinMode(CAP_HIGH_PIN,OUTPUT);
+  pinMode(RELAY_CONTROL,OUTPUT);
   
   getTempThreshold();                                       //this function is defined below.
 
@@ -84,13 +85,15 @@ void capCheck(uint16_t capReading){                        //function used to ch
   if(capReading>capThreshold[MAX]){                        //if branch executes if cap is over max.
     digitalWrite(CAP_HIGH_PIN,HIGH);                       //sets cap high pin to high.
     digitalWrite(CAP_LOW_PIN,LOW);                         //used to detect overwatering.
+    digitalWrite(RELAY_CONTROL,LOW);
   }
   else if(capReading<capThreshold[MIN]){                   //if branch executes if cap is below min.
     digitalWrite(CAP_HIGH_PIN,LOW);                        //sets cap low pin to high.
-    digitalWrite(CAP_LOW_PIN,HIGH);                        //this will activate relay in circuit.
+    digitalWrite(CAP_LOW_PIN,HIGH);   
+    digitalWrite(RELAY_CONTROL,HIGH);                      //this will activate relay in circuit.
   }
   else{                                                    //if branch executes if in range.
     digitalWrite(CAP_HIGH_PIN,LOW);                        //sets both pins to low.
     digitalWrite(CAP_LOW_PIN,LOW);
+    digitalWrite(RELAY_CONTROL,LOW);
   }
-}
