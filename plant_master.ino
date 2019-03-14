@@ -31,13 +31,7 @@ void loop(){
     Serial.print(": ");
     Serial.println(pinState);
   }
-  if(buttonPress()){
-    deviceNum++;
-    delay(500);
-  }
-  if(deviceNum==devices){
-    deviceNum=0;
-  }
+  deviceSwitch();
 }
 
 int arraySizeCheck(int *arraySize){                           //user defined function to get input
@@ -76,5 +70,15 @@ int buttonPress(){                                            //function that de
   }
   else{
     return 0;
+  }
+}
+
+void deviceSwitch(){
+   if(buttonPress()){
+    deviceNum++;
+    delay(500);
+  }
+  if(deviceNum==devices){
+    deviceNum=0;
   }
 }
