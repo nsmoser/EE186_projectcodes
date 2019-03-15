@@ -1,3 +1,7 @@
+#include<LiquidCrystal.h>                                    //library needed to make lcd screen work
+const int rs=13,en=12,d4=11,d5=10,d6=9,d7=8;
+LiquidCrystal lcd(rs,en,d4,d5,d6,d7);                        //specifies which wires are connected to which lcd spots
+
 const int WIRES=4;                                           //specifies wires per sender arduino
 const int DEVICE_MAX=8;                                      //specifies maximum amount of devices allowed to master
 const int ARRAY_MAX=32;                                      //specifies max array elements
@@ -10,11 +14,14 @@ int arrayIndexes,devices,i,j;                                //variables needed 
 
 
 void setup(){
-  pinMode(BUTTON_PIN,INPUT);
+  pinMode(BUTTON_PIN,INPUT);                                 //sets button up to be used as input
+  lcdBegin();                                                //function with startup info for lcd
+  
   Serial.begin(9600);
-  int *arrayPointer=&arrayIndexes;
+  int *arrayPointer=&arrayIndexes;                           //pointer that is handed off to arraySizeCheck
   
   while(!loopExit){                                          //waits for user exit flag to be true
+    lcdPrompt();                                             //function that displays prompt on lcd screen
     devices=arraySizeCheck(arrayPointer);                    //gets number of arduinos connected
     Serial.begin(9600);                                      //restarts serial
   }
@@ -73,12 +80,29 @@ int buttonPress(){                                            //function that de
   }
 }
 
-void deviceSwitch(){
-   if(buttonPress()){
-    deviceNum++;
-    delay(500);
+void deviceSwitch(){                                          //function that controls switching between devices
+   if(buttonPress()){                                         //calls buttonPress function and waits for a return value
+    deviceNum++;                                              //increments device number by 1
+    delay(500);                                               //half second delay prevents rapid incrementing by accident
   }
-  if(deviceNum==devices){
-    deviceNum=0;
-  }
+  if(deviceNum==devices){                                     //checks if deviceNum is equal to devices
+    deviceNum=0;                                              //resets device number to zero
+  }                                                           //to get actual device number, add one to deviceNum, 0 only used due to array indexeMs
+}
+
+void lcdPrompt(){                                             //displays on lcd screen on startup
+    lcd.home();                                               //function created for readability
+    lcd.print("Please follow");
+    lcd.setCursor(0,1);
+    lcd.print("instructions on");
+    lcd.setCursor(0,2);
+    lcd.print("serial monitor");
+}
+
+void lcdBegin(){                                             //startup info for lcd screen
+  pinMode(5,OUTPUT);                                         //sets up constrast and brightness for lcd screen
+  pinMode(6,OUTPUT);
+  analogWrite(5,50);                                         //lowered voltages achieved by pwm
+  analogWrite(6,75);
+  lcd.begin(20,4);                                           //starts lcd screen
 }
