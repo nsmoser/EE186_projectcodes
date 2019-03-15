@@ -26,17 +26,15 @@ void setup(){
     Serial.begin(9600);                                      //restarts serial
   }
   wireIdentification(*arrayPointer,devices);
-
+  lcd.clear();
 }
 
 int deviceNum=0;                                             //deviceNum declared outside of loop so it is not reset to zero by accident
 
 void loop(){
+  lcdStatus();
   for(i=0;i!=WIRES;i++){
     int pinState=digitalRead(wireKeeper[deviceNum][i]);
-    Serial.print(wireKeeper[deviceNum][i]);
-    Serial.print(": ");
-    Serial.println(pinState);
   }
   deviceSwitch();
 }
@@ -103,6 +101,13 @@ void lcdBegin(){                                             //startup info for 
   pinMode(5,OUTPUT);                                         //sets up constrast and brightness for lcd screen
   pinMode(6,OUTPUT);
   analogWrite(5,50);                                         //lowered voltages achieved by pwm
-  analogWrite(6,75);
+  analogWrite(6,100);
   lcd.begin(20,4);                                           //starts lcd screen
+}
+
+void lcdStatus(){                                            //prints device number and status line
+  lcd.home();                                                //moved for readability
+  lcd.print("Device ");lcd.print(deviceNum+1);
+  lcd.setCursor(0,1);
+  lcd.print("Status");
 }
