@@ -84,7 +84,7 @@ void tempCheck(){                                           //function that disp
   }
   if(digitalRead(wireKeeper[deviceNum][tempHigh])<digitalRead(wireKeeper[deviceNum][tempLow])){
     lcd.setCursor(0,2);
-    lcd.print("Temp: Too Low");
+    lcd.print("Temp: Too Low ");
   }
 }
 
@@ -99,6 +99,6 @@ void capCheck(){                                            //function that disp
   }
   if(digitalRead(wireKeeper[deviceNum][capHigh])<digitalRead(wireKeeper[deviceNum][capLow])){
     lcd.setCursor(0,3);
-    lcd.print("Moisture: Too Low");
+    lcd.print("Moisture: Too Low ");
   }
 }
