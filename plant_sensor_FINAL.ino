@@ -10,10 +10,12 @@ Relies on Adafruit seesaw library, not included with arduino IDE.
 Adafruit_seesaw ss;                                         //needed for soil sensor.
 const int MIN=0,MAX=1;                                      //used when indexing threshold arrays.
 const int TEMP_LOW_PIN=5,TEMP_HIGH_PIN=6;                   //assigns pins to be used later.
-const int CAP_LOW_PIN=7,CAP_HIGH_PIN=8;                     //no reason why specific numbers were picked.
+const int CAP_HIGH_PIN=7,CAP_LOW_PIN=8;                     //no reason why specific numbers were picked.
 const int RELAY_CONTROL=9;                                  //pin used to control relay.
 float tempThreshold[2],capThreshold[2];                     //creates threshold arrays.
 String minMax[2]={"Minimum","Maximum"};                     //array of strings used for min max prompt.
+bool cap_read_disable;                                      //used to disable or enable capacative reading
+int counter=0;                                              //used to disable or enable capacative reading
                                                             
 void setup(){
   ss.begin(0x36);                                           //connects soil sensor.
@@ -33,11 +35,13 @@ void setup(){
 
 void loop(){
   uint16_t capReading = ss.touchRead(0);                    //these two lines get the temperature
-  float tempF=(((ss.getTemp())*(9.0/5.0))+32);              //and cap reading from the sensor.
+  float tempF=(((ss.getTemp())*(9.0/5.0))+27);              //and cap reading from the sensor.
 
   tempCheck(tempF);                                         //temp check function defined below
 
-  capCheck(capReading);                                     //cap check function defined below
+  capCheck(capReading);
+
+  printData(tempF,capReading);
 
   delay(1000);                                              //waits a second to restart loop
 }
@@ -82,18 +86,40 @@ void tempCheck(float tempF){                                //function used to c
 }
 
 void capCheck(uint16_t capReading){                        //function used to check cap reading in main.
+
+
+  if(cap_read_disable){
+    counter++;
+    if(counter==2){
+      digitalWrite(RELAY_CONTROL,LOW);
+      digitalWrite(CAP_LOW_PIN,LOW);
+    }
+    if(counter==200){
+      cap_read_disable=false;
+      counter=0;
+    }
+    return;
+  }
   if(capReading>capThreshold[MAX]){                        //if branch executes if cap is over max.
     digitalWrite(CAP_HIGH_PIN,HIGH);                       //sets cap high pin to high.
     digitalWrite(CAP_LOW_PIN,LOW);                         //used to detect overwatering.
     digitalWrite(RELAY_CONTROL,LOW);
+    cap_read_disable=false;
   }
   else if(capReading<capThreshold[MIN]){                   //if branch executes if cap is below min.
     digitalWrite(CAP_HIGH_PIN,LOW);                        //sets cap low pin to high.
     digitalWrite(CAP_LOW_PIN,HIGH);   
     digitalWrite(RELAY_CONTROL,HIGH);                      //this will activate relay in circuit.
+    cap_read_disable=true;
   }
   else{                                                    //if branch executes if in range.
     digitalWrite(CAP_HIGH_PIN,LOW);                        //sets both pins to low.
     digitalWrite(CAP_LOW_PIN,LOW);
     digitalWrite(RELAY_CONTROL,LOW);
+    cap_read_disable=false;
   }
+}
+void printData(float tempF,uint16_t capReading){
+  Serial.println(tempF);
+  Serial.println(capReading);
+}
